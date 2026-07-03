@@ -33,7 +33,7 @@ fun AppEventos(modifier: Modifier = Modifier) {
             .safeDrawingPadding(),
         topBar = {
             TopAppBar(
-                title = { Text(text = "Eventos Compose") }
+                title = { Text(text = "Eventos") }
             )
         }
     ) { paddingInterno ->

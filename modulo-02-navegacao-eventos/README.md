@@ -1,6 +1,6 @@
 # Modulo 02 - Navegacao e Fluxo de Telas
 
-Aplicativo simples de eventos criado com Jetpack Compose e Material 3.
+Aplicativo simples de eventos criado com Jetpack Compose, Material 3 e Scaffold.
 
 ## O que foi praticado
 
@@ -17,17 +17,3 @@ Aplicativo simples de eventos criado com Jetpack Compose e Material 3.
 - Detalhe do evento
 - Inscricao
 - Confirmacao
-
-## Como abrir
-
-Abra esta pasta no Android Studio:
-
-```text
-modulo-02-navegacao-eventos
-```
-
-## Validacao
-
-```powershell
-.\gradlew.bat :app:compileDebugKotlin
-```
