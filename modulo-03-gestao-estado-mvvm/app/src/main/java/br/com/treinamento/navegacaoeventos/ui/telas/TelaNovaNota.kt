@@ -1,0 +1,109 @@
+package br.com.treinamento.navegacaoeventos.ui.telas
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+
+@Composable
+fun TelaNovaNota(
+    onCancelar: () -> Unit,
+    onSalvar: (String, List<Double>) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val nomeState = remember { mutableStateOf("") }
+    val notasState = remember { mutableStateListOf("") }
+    val erroState = remember { mutableStateOf<String?>(null) }
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text(text = "Nova Nota", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+
+        OutlinedTextField(
+            value = nomeState.value,
+            onValueChange = {
+                nomeState.value = it
+                erroState.value = null
+            },
+            label = { Text("Nome") },
+            isError = erroState.value != null && nomeState.value.isBlank(),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        notasState.forEachIndexed { indice, valor ->
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(
+                    value = valor,
+                    onValueChange = {
+                        notasState[indice] = it
+                        erroState.value = null
+                    },
+                    label = { Text("Nota ${indice + 1}") },
+                    isError = erroState.value != null && !valor.isNotaValida(),
+                    modifier = Modifier.weight(1f)
+                )
+
+                if (notasState.size > 1) {
+                    TextButton(onClick = { notasState.removeAt(indice) }) {
+                        Text(text = "Remover")
+                    }
+                }
+            }
+        }
+
+        Button(onClick = { notasState.add("") }, modifier = Modifier.fillMaxWidth()) {
+            Text(text = "+ Adicionar nota")
+        }
+
+        erroState.value?.let { erro ->
+            Text(text = erro, color = MaterialTheme.colorScheme.error)
+        }
+
+        RowButtons(onCancelar = onCancelar, onSalvar = {
+            val nome = nomeState.value.trim()
+            val notas = notasState.mapNotNull { valor -> valor.replace(',', '.').toDoubleOrNull() }
+
+            if (nome.isBlank()) {
+                erroState.value = "Informe o nome do aluno."
+                return@RowButtons
+            }
+
+            if (notas.size != notasState.size || notas.any { nota -> nota !in 0.0..10.0 }) {
+                erroState.value = "Informe apenas notas entre 0 e 10."
+                return@RowButtons
+            }
+
+            onSalvar(nome, notas)
+        })
+    }
+}
+
+private fun String.isNotaValida(): Boolean {
+    return replace(',', '.').toDoubleOrNull()?.let { nota -> nota in 0.0..10.0 } ?: false
+}
+
+@Composable
+private fun RowButtons(onCancelar: () -> Unit, onSalvar: () -> Unit) {
+    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        TextButton(onClick = onCancelar, modifier = Modifier.fillMaxWidth()) { Text(text = "Cancelar") }
+        Button(onClick = onSalvar, modifier = Modifier.fillMaxWidth()) { Text(text = "Salvar") }
+    }
+}
